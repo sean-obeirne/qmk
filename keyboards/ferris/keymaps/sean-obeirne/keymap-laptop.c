@@ -9,16 +9,10 @@ enum custom_keycodes {
     // Window management
     QUIT = SAFE_RANGE,  // close current window
     ALT_TAB,
-    WKSP_1,          // go left 1 workspace
-    WKSP_2,          // go left 1 workspace
-    WKSP_3,          // go left 1 workspace
-    WKSP_4,          // go left 1 workspace
-    WKSP_5,          // go left 1 workspace
-    WKSP_6,          // go left 1 workspace
-    WKSP_7,          // go left 1 workspace
-    WKSP_8,          // go left 1 workspace
-    WKSP_9,          // go left 1 workspace
-    WKSP_10,          // go left 1 workspace
+    WKSP_LEFT,          // go left 1 workspace
+    WKSP_RGHT,          // go right 1 workspace
+    WKSP_MLFT,          // move window left 1 worksapce
+    WKSP_MRGT,          // move window right 1 worksapce
 
     // Firefox shortcuts
     FF_LEFT,
@@ -34,23 +28,26 @@ enum custom_keycodes {
 
     // Custom functionalities
     PASSWD,
-    FLAG
+    FLAG,
+
+    // System
+    SWITCH_KB
 };
 
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	[ALPHA] = LAYOUT( // alpha layer
-                      KC_Q,               KC_W,               KC_E,          KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,                  KC_P,
-        MT(MOD_LSFT, KC_A), MT(MOD_LALT, KC_S), MT(MOD_RCTL, KC_D), LT(NUM, KC_F),    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,               KC_SCLN,
-        MT(MOD_RSFT, KC_Z),               KC_X,               KC_C,          KC_V,    KC_B,    KC_N,    KC_M, KC_COMM,  KC_DOT, MT(MOD_RSFT, KC_SLSH),
-                                      LT(EDITOR, KC_ESC),  KC_SPC, KC_ENT, LT(NAVIGATION, KC_BSPC)
+                   KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,
+                   KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN,
+     MT(MOD_LSFT, KC_Z),    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M, KC_COMM,  KC_DOT, MT(MOD_RSFT, KC_SLSH),
+                  LT(EDITOR, KC_ESC),  MT(MOD_LALT, KC_SPC), MT(MOD_RCTL, KC_ENT), LT(NAVIGATION, KC_BSPC)
     ),
     [EDITOR] = LAYOUT(
      KC_TAB, QK_BOOT,  PASSWD,    FLAG, _______,  KC_DEL, _______, _______, KC_LPRN, KC_RPRN,
      KC_ESC, KC_BSLS,  KC_GRV, KC_QUOT, _______, KC_BSPC, KC_MINS,  KC_EQL, KC_LBRC, KC_RBRC,
     KC_LSFT, _______, _______, MO(NUM), _______,  KC_ENT,  KC_ESC,  KC_DEL, KC_BSPC,  KC_ENT,
-                               _______, _______,  KC_ENT,  KC_ESC
+                               _______, _______,  KC_ENT, KC_BSPC
     ),
     [NUM] = LAYOUT(
      KC_NUM,   KC_F1,   KC_F2,   KC_F3,   KC_F4, _______,    KC_7,   KC_8,   KC_9, _______,
@@ -59,10 +56,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                _______, _______, _______,    KC_0
     ),
     [NAVIGATION] = LAYOUT(
-       WKSP_6,  WKSP_7,   WKSP_8,  WKSP_9, WKSP_10, FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
-       WKSP_1,  WKSP_2,   WKSP_3,  WKSP_4,  WKSP_5, KC_BSPC, KC_HOME, KC_PGDN, KC_PGUP,  KC_END,
-         QUIT, BROWSER, TERMINAL,  NEOVIM, _______, FF_CTAB, KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,
-                                  _______, _______, _______, _______
+         QUIT,   KC_LWIN,   KC_MPRV,   KC_MNXT,           KC_MPLY, FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
+    WKSP_MLFT, WKSP_MRGT, WKSP_LEFT, WKSP_RGHT,   KC_KB_VOLUME_UP, ALT_TAB, KC_HOME, KC_PGDN, KC_PGUP,  KC_END,
+        NOTES,   BROWSER,  TERMINAL,    NEOVIM, KC_KB_VOLUME_DOWN, FF_CTAB, KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,
+                                     SWITCH_KB,  _______, _______, _______
     )
 };
 // clang-format on
@@ -123,46 +120,64 @@ void ctrl_shift(uint16_t keycode, bool pressed) {
     }
 }
 
+bool is_alt_tabbing = false;
+
 bool is_recording = false;
 char recorded_text[256] = "";
 uint8_t recorded_length = 0;
-static bool ctrl_h_active = false;  // Track if Ctrl-H is active
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool p = record->event.pressed;
+    if (is_alt_tabbing && p) {
+        if (keycode != ALT_TAB && keycode != KC_I && keycode != KC_O) {
+            unregister_mods(MOD_BIT(KC_LALT));
+            is_alt_tabbing = false;
+            return false;
+        }
+        else {
+            if (keycode == KC_O)
+                shift(KC_ESC, p);
+            else
+                tap_code(KC_ESC);
+            return false;
+        }
+    }
     switch (keycode) {
         // System-level shortcuts
         case QUIT:
             alt_shift(KC_Q, p);
             return false;
-        case KC_H:  // Intercept the 'h' key
-            if (record->event.pressed) {  // Key is pressed
-                if (get_mods() & MOD_BIT(KC_RCTL | KC_LT)) {  // Check if Right Ctrl is held
-                    unregister_mods(MOD_BIT(KC_RCTL));  // Temporarily release Right Ctrl
-                    register_code(KC_BSPC);  // Start sending Backspace
-                    ctrl_h_active = true;  // Track the state
+        case ALT_TAB:
+            if (p) {
+                if (is_alt_tabbing) {
+                    tap_code(KC_ESC);
                 } else {
-                    tap_code(KC_H);  // Send 'h' as usual
-                }
-            } else {  // Key is released
-                if (ctrl_h_active) {  // Only unregister if Ctrl-H was active
-                    unregister_code(KC_BSPC);  // Stop sending Backspace
-                    register_mods(MOD_BIT(KC_RCTL));  // Restore Right Ctrl state
-                    ctrl_h_active = false;  // Reset the state
+                    register_mods(MOD_BIT(KC_LALT));
+                    is_alt_tabbing = true;
+                    tap_code(KC_ESC);
                 }
             }
-            return false;  // Skip default processing
-        // Moving Workspaces
-        case WKSP_1: if (p) alt(KC_1, p); return false;
-        case WKSP_2: if (p) alt(KC_2, p); return false;
-        case WKSP_3: if (p) alt(KC_3, p); return false;
-        case WKSP_4: if (p) alt(KC_4, p); return false;
-        case WKSP_5: if (p) alt(KC_5, p); return false;
-        case WKSP_6: if (p) alt(KC_6, p); return false;
-        case WKSP_7: if (p) alt(KC_7, p); return false;
-        case WKSP_8: if (p) alt(KC_8, p); return false;
-        case WKSP_9: if (p) alt(KC_9, p); return false;
-        case WKSP_10: if (p) alt(KC_0, p); return false;
+            return false;
+        case KC_SPC:
+            if (is_alt_tabbing) {
+                if (p) {
+                    tap_code(KC_ESC);
+                }
+                return false;
+            }
+            return true;
+        case WKSP_RGHT:
+            alt_shift(KC_RGHT, p);
+            return false;
+        case WKSP_LEFT:
+            alt_shift(KC_LEFT, p);
+            return false;
+        case WKSP_MRGT:
+            win_shift(KC_RGHT, p);
+            return false;
+        case WKSP_MLFT:
+            win_shift(KC_LEFT, p);
+            return false;
 
         // Firefox shortcuts
         case FF_RGHT:
