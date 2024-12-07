@@ -4,21 +4,33 @@
 #define EDITOR 1
 #define NAVIGATION 2
 #define NUM 3
+#define RS 4
+#define SYS 5
 
 enum custom_keycodes {
     // Window management
-    QUIT = SAFE_RANGE,  // close current window
+    QUIT = SAFE_RANGE,
     ALT_TAB,
-    WKSP_1,          // go left 1 workspace
-    WKSP_2,          // go left 1 workspace
-    WKSP_3,          // go left 1 workspace
-    WKSP_4,          // go left 1 workspace
-    WKSP_5,          // go left 1 workspace
-    WKSP_6,          // go left 1 workspace
-    WKSP_7,          // go left 1 workspace
-    WKSP_8,          // go left 1 workspace
-    WKSP_9,          // go left 1 workspace
-    WKSP_10,          // go left 1 workspace
+    WKSP_1,
+    WKSP_2,
+    WKSP_3,
+    WKSP_4,
+    WKSP_5,
+    WKSP_6,
+    WKSP_7,
+    WKSP_8,
+    WKSP_9,
+    WKSP_10,
+    MWKSP_1,
+    MWKSP_2,
+    MWKSP_3,
+    MWKSP_4,
+    MWKSP_5,
+    MWKSP_6,
+    MWKSP_7,
+    MWKSP_8,
+    MWKSP_9,
+    MWKSP_10,
 
     // Firefox shortcuts
     FF_LEFT,
@@ -27,10 +39,13 @@ enum custom_keycodes {
     FF_CTAB,
 
     // Launchers
+    DMENU,
     NEOVIM,
     TERMINAL,
     BROWSER,
     NOTES,
+    SPOTIFY,
+    YTMUSIC,
 
     // Custom functionalities
     PASSWD,
@@ -61,8 +76,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [NAVIGATION] = LAYOUT(
        WKSP_6,  WKSP_7,   WKSP_8,  WKSP_9, WKSP_10, FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
        WKSP_1,  WKSP_2,   WKSP_3,  WKSP_4,  WKSP_5, KC_BSPC, KC_HOME, KC_PGDN, KC_PGUP,  KC_END,
-         QUIT, BROWSER, TERMINAL,  NEOVIM, _______, FF_CTAB, KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,
-                                  _______, _______, _______, _______
+         QUIT, BROWSER, TERMINAL,  NEOVIM,   DMENU, FF_CTAB, KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,
+                                  MO(SYS),  TO(RS), _______, _______
+    ),
+    [RS] = LAYOUT(
+       KC_1,    KC_2,    KC_3,    KC_4,    KC_5,      KC_6,    KC_7,    KC_8,    KC_9,    KC_0,
+      KC_F1,   KC_F2,   KC_F3,   KC_F4, KC_LSFT, TO(ALPHA),    KC_4,    KC_5,    KC_6, _______,
+      KC_F5,   KC_F6,   KC_F7,   KC_F8,  KC_F10,   _______,    KC_1,    KC_2,    KC_3, _______,
+                                KC_ESC,  KC_SPC,   _______,    KC_0
+    ),
+    [SYS] = LAYOUT(
+    MWKSP_6, MWKSP_7,  MWKSP_8, MWKSP_9, MWKSP_10, FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
+    MWKSP_1, MWKSP_2,  MWKSP_3, MWKSP_4,  MWKSP_5,  KC_MPLY, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
+       QUIT, BROWSER, TERMINAL,  NEOVIM,    DMENU, KC_MUTE, SPOTIFY, KC_BRIU, KC_BRID, YTMUSIC,
+                               _______, TO(ALPHA), _______, _______
     )
 };
 // clang-format on
@@ -152,7 +179,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;  // Skip default processing
-        // Moving Workspaces
+        // Swirch Workspaces
         case WKSP_1: if (p) alt(KC_1, p); return false;
         case WKSP_2: if (p) alt(KC_2, p); return false;
         case WKSP_3: if (p) alt(KC_3, p); return false;
@@ -163,6 +190,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case WKSP_8: if (p) alt(KC_8, p); return false;
         case WKSP_9: if (p) alt(KC_9, p); return false;
         case WKSP_10: if (p) alt(KC_0, p); return false;
+
+        // Move Workspaces
+        case MWKSP_1: if (p) alt_shift(KC_1, p); return false;
+        case MWKSP_2: if (p) alt_shift(KC_2, p); return false;
+        case MWKSP_3: if (p) alt_shift(KC_3, p); return false;
+        case MWKSP_4: if (p) alt_shift(KC_4, p); return false;
+        case MWKSP_5: if (p) alt_shift(KC_5, p); return false;
+        case MWKSP_6: if (p) alt_shift(KC_6, p); return false;
+        case MWKSP_7: if (p) alt_shift(KC_7, p); return false;
+        case MWKSP_8: if (p) alt_shift(KC_8, p); return false;
+        case MWKSP_9: if (p) alt_shift(KC_9, p); return false;
+        case MWKSP_10: if (p) alt_shift(KC_0, p); return false;
 
         // Firefox shortcuts
         case FF_RGHT:
@@ -190,6 +229,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case NOTES:
             alt(KC_K, p);
+            return false;
+        case DMENU:
+            alt(KC_D, p);
+            return false;
+        case SPOTIFY:
+            alt(KC_S, p);
+            return false;
+        case YTMUSIC:
+            alt(KC_Y, p);
             return false;
 
         // System Controls
