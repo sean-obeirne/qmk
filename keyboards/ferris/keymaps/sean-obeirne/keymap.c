@@ -1,11 +1,13 @@
 #include QMK_KEYBOARD_H
 
 #define ALPHA 0
-#define EDITOR 1
-#define NAVIGATION 2
-#define NUM 3
-#define RS 4
-#define SYS 5
+#define NUM 1
+#define EDITOR 2
+#define NAVIGATION 3
+#define APPS 4
+#define MOVEMENT 5
+#define RS 6
+#define SYS 7
 
 enum custom_keycodes {
     // Window management
@@ -37,6 +39,14 @@ enum custom_keycodes {
     FF_RGHT,
     FF_NTAB,
     FF_CTAB,
+    FF_RFSH,
+
+    // Neovim shortcuts
+    NVAUTOD,
+    NVAUTOU,
+    COPY,
+    CUT,
+    PASTE,
 
     // Launchers
     DMENU,
@@ -46,38 +56,54 @@ enum custom_keycodes {
     NOTES,
     SPOTIFY,
     YTMUSIC,
+    PAVUCTRL,
+    EVINCE,
+    OSRS,
 
     // Custom functionalities
     PASSWD,
     FLAG
 };
 
+/*** KEYMAPS ***/
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	[ALPHA] = LAYOUT( // alpha layer
-                      KC_Q,               KC_W,               KC_E,          KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,                  KC_P,
-        MT(MOD_LSFT, KC_A), MT(MOD_LALT, KC_S), MT(MOD_RCTL, KC_D), LT(NUM, KC_F),    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,               KC_SCLN,
-        MT(MOD_RSFT, KC_Z),               KC_X,               KC_C,          KC_V,    KC_B,    KC_N,    KC_M, KC_COMM,  KC_DOT, MT(MOD_RSFT, KC_SLSH),
-                                      LT(EDITOR, KC_ESC),  KC_SPC, KC_ENT, LT(NAVIGATION, KC_BSPC)
+         LT(SYS, KC_Q),               KC_W,                 KC_E,             KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,                  KC_P,
+        LT(APPS, KC_A), MT(MOD_LALT, KC_S),   MT(MOD_RCTL, KC_D),    LT(NUM, KC_F),    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,               KC_SCLN,
+    MT(MOD_LSFT, KC_Z),               KC_X, LT(NAVIGATION, KC_C), LT(EDITOR, KC_V),    KC_B,    KC_N,    KC_M, KC_COMM,  KC_DOT, MT(MOD_RSFT, KC_SLSH),
+                    LT(NAVIGATION, KC_ESC),               KC_SPC,           KC_ENT, KC_BSPC
     ),
     [EDITOR] = LAYOUT(
-     KC_TAB, QK_BOOT,  PASSWD,    FLAG, _______,  KC_DEL, _______, _______, KC_LPRN, KC_RPRN,
-     KC_ESC, KC_BSLS,  KC_GRV, KC_QUOT, _______, KC_BSPC, KC_MINS,  KC_EQL, KC_LBRC, KC_RBRC,
-    KC_LSFT, _______, _______, MO(NUM), _______,  KC_ENT,  KC_ESC,  KC_DEL, KC_BSPC,  KC_ENT,
-                               _______, _______,  KC_ENT,  KC_ESC
+    KC_LSFT, QK_BOOT, _______, _______, _______, _______, NVAUTOD, NVAUTOU, KC_LPRN, KC_RPRN,
+    KC_RSFT, KC_PSCR,    COPY, _______, _______, KC_QUOT, KC_MINS,  KC_EQL, KC_LBRC, KC_RBRC,
+    KC_LSFT,     CUT,   PASTE, _______, _______, _______,  KC_TAB, KC_QUOT,  KC_GRV, KC_BSLS,
+                               _______, _______, _______, KC_BSPC
     ),
     [NUM] = LAYOUT(
-     KC_NUM,   KC_F1,   KC_F2,   KC_F3,   KC_F4, _______,    KC_7,   KC_8,   KC_9, _______,
-    _______,   KC_F5,   KC_F6,   KC_F7,   KC_F8, _______,    KC_4,   KC_5,   KC_6, _______,
-    _______,   KC_F9,  KC_F10,  KC_F11,  KC_F12, _______,    KC_1,   KC_2,   KC_3, _______,
-                               _______, _______, _______,    KC_0
+     KC_NUM,   KC_F1,   KC_F2,   KC_F3,   KC_F4, KC_PAST,    KC_7,   KC_8,   KC_9, KC_PMNS,
+    _______,   KC_F5,   KC_F6,   KC_F7,   KC_F8, KC_PSLS,    KC_4,   KC_5,   KC_6, KC_PPLS,
+    _______,   KC_F9,  KC_F10,  KC_F11,  KC_F12, KC_PEQL,    KC_1,   KC_2,   KC_3,  KC_DOT,
+                               _______, _______,  KC_ENT,    KC_0
+    ),
+    [APPS] = LAYOUT(
+    _______, PAVUCTRL,  SPOTIFY, YTMUSIC,  EVINCE, _______, _______, _______, _______, _______,
+    _______,  BROWSER, TERMINAL,  NEOVIM,    QUIT, _______, _______, _______, _______, _______,
+    _______,     OSRS,  _______, _______, _______, _______, _______, _______, _______, _______,
+                                 _______, _______, _______, _______
     ),
     [NAVIGATION] = LAYOUT(
-       WKSP_6,  WKSP_7,   WKSP_8,  WKSP_9, WKSP_10, FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
-       WKSP_1,  WKSP_2,   WKSP_3,  WKSP_4,  WKSP_5, KC_BSPC, KC_HOME, KC_PGDN, KC_PGUP,  KC_END,
-         QUIT, BROWSER, TERMINAL,  NEOVIM,   DMENU, FF_CTAB, KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,
-                                  MO(SYS),  TO(RS), _______, _______
+           WKSP_5,  WKSP_6,   WKSP_7,  WKSP_8,  WKSP_9, FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
+           WKSP_1,  WKSP_2,   WKSP_3,  WKSP_4, WKSP_10, FF_RFSH, KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,
+    OSL(MOVEMENT), _______, _______, _______,  _______, FF_CTAB, KC_HOME, KC_PGDN, KC_PGUP,  KC_END,
+                                     _______,   TO(RS), _______, _______
+    ),
+    [MOVEMENT] = LAYOUT(
+    MWKSP_5, MWKSP_6, MWKSP_7, MWKSP_8,  MWKSP_9, _______, _______, _______, _______, _______,
+    MWKSP_1, MWKSP_2, MWKSP_3, MWKSP_4, MWKSP_10, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______,
+                               _______,  _______, _______, _______
     ),
     [RS] = LAYOUT(
        KC_1,    KC_2,    KC_3,    KC_4,    KC_5,      KC_6,    KC_7,    KC_8,    KC_9,    KC_0,
@@ -86,13 +112,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                 KC_ESC,  KC_SPC,   _______,    KC_0
     ),
     [SYS] = LAYOUT(
-    MWKSP_6, MWKSP_7,  MWKSP_8, MWKSP_9, MWKSP_10, FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
-    MWKSP_1, MWKSP_2,  MWKSP_3, MWKSP_4,  MWKSP_5,  KC_MPLY, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
-       QUIT, BROWSER, TERMINAL,  NEOVIM,    DMENU, KC_MUTE, SPOTIFY, KC_BRIU, KC_BRID, YTMUSIC,
-                               _______, TO(ALPHA), _______, _______
+    _______, _______,  _______, _______, _______, FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
+    _______, _______,  _______, _______, _______, KC_MPLY, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
+       QUIT, BROWSER, TERMINAL,  NEOVIM,   DMENU, KC_MUTE, SPOTIFY, KC_BRIU, KC_BRID, YTMUSIC,
+                                _______, TO(ALPHA), _______, _______
     )
 };
 // clang-format on
+
+/*** END KEYMAPS ***/
+
+/*
+    [x] = LAYOUT(
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+                               _______, _______, _______, _______
+    )
+*/
+
 
 // Send alt-shift-keycode
 void alt_shift(uint16_t keycode, bool pressed) {
@@ -150,11 +188,6 @@ void ctrl_shift(uint16_t keycode, bool pressed) {
     }
 }
 
-bool is_recording = false;
-char recorded_text[256] = "";
-uint8_t recorded_length = 0;
-static bool ctrl_h_active = false;  // Track if Ctrl-H is active
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool p = record->event.pressed;
     switch (keycode) {
@@ -162,23 +195,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case QUIT:
             alt_shift(KC_Q, p);
             return false;
-        case KC_H:  // Intercept the 'h' key
-            if (record->event.pressed) {  // Key is pressed
-                if (get_mods() & MOD_BIT(KC_RCTL | KC_LT)) {  // Check if Right Ctrl is held
-                    unregister_mods(MOD_BIT(KC_RCTL));  // Temporarily release Right Ctrl
-                    register_code(KC_BSPC);  // Start sending Backspace
-                    ctrl_h_active = true;  // Track the state
-                } else {
-                    tap_code(KC_H);  // Send 'h' as usual
-                }
-            } else {  // Key is released
-                if (ctrl_h_active) {  // Only unregister if Ctrl-H was active
-                    unregister_code(KC_BSPC);  // Stop sending Backspace
-                    register_mods(MOD_BIT(KC_RCTL));  // Restore Right Ctrl state
-                    ctrl_h_active = false;  // Reset the state
-                }
-            }
-            return false;  // Skip default processing
+
         // Swirch Workspaces
         case WKSP_1: if (p) alt(KC_1, p); return false;
         case WKSP_2: if (p) alt(KC_2, p); return false;
@@ -216,6 +233,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case FF_CTAB:
             ctrl(KC_W, p);
             return false;
+        case FF_RFSH:
+            ctrl(KC_R, p);
+            return false;
+
+        // Neovim shortcuts
+        case NVAUTOD:
+            alt(KC_DOWN, p);
+            return false;
+        case NVAUTOU:
+            alt(KC_UP, p);
+            return false;
+        case COPY:
+            ctrl(KC_C, p);
+            return false;
+        case CUT:
+            ctrl(KC_X, p);
+            return false;
+        case PASTE:
+            ctrl(KC_V, p);
+            return false;
 
         // Launchers
         case NEOVIM:
@@ -238,6 +275,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case YTMUSIC:
             alt(KC_Y, p);
+            return false;
+        case PAVUCTRL:
+            alt(KC_P, p);
+            return false;
+        case EVINCE:
+            alt(KC_E, p);
+            return false;
+        case OSRS:
+            alt_shift(KC_R, p);
             return false;
 
         // System Controls
@@ -264,24 +310,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 // }
             }
             return false;
-
-
-    }
-    if (is_recording && p) {
-        recorded_text[recorded_length] = keycode;
-        recorded_length++;
     }
     return true; // Process other keys normally
 }
-
-/*
-    [x] = LAYOUT(
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-                               _______, _______, _______, _______
-    )
-*/
 
 /*
 // All QMK Keycodes (Aliases Only)
