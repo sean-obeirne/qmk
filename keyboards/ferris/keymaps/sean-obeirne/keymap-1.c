@@ -4,10 +4,10 @@
 #define NUM 1
 #define EDITOR 2
 #define NAVIGATION 3
-// #define APPS 4
-#define MOVEMENT 4
-#define RS 5
-#define SYS 6
+#define APPS 4
+#define MOVEMENT 5
+#define RS 6
+#define SYS 7
 
 enum custom_keycodes {
     // Window management
@@ -33,10 +33,6 @@ enum custom_keycodes {
     MWKSP_8,
     MWKSP_9,
     MWKSP_10,
-    WSHRINK,
-    HSHRINK,
-    WGROW,
-    HGROW,
     WINLEFT,
     WINDOWN,
     WINUP,
@@ -76,88 +72,34 @@ enum custom_keycodes {
     FLAG
 };
 
-
-
-const uint16_t PROGMEM right_arrow_combo[] = {KC_L, KC_SCLN, COMBO_END};
-const uint16_t PROGMEM alt_right_arrow_combo[] = {KC_O, KC_P, COMBO_END}; // O + P → Left Alt + Right Arrow
-const uint16_t PROGMEM editor_layer_combo[] = {KC_U, KC_I, COMBO_END}; // U + I → EDITOR Layer
-const uint16_t PROGMEM num_layer_combo[] = {KC_J, KC_K, COMBO_END};    // J + K → NUM Layer
-const uint16_t PROGMEM alpha_layer_combo[] = {KC_KP_5, KC_KP_4, COMBO_END};
-
-enum combo_events {
-    RIGHT_ARROW,
-    ALT_RIGHT_ARROW,
-    EDITOR_LAYER,
-    NUM_LAYER,
-    ALPHA_LAYER,
-    COMBO_COUNT
-};
-
-combo_t key_combos[COMBO_COUNT] = {
-    [RIGHT_ARROW] = COMBO(right_arrow_combo, KC_RGHT), // L + ; → Right Arrow
-    [ALT_RIGHT_ARROW] = COMBO(alt_right_arrow_combo, KC_NO), // O + P triggers custom function
-    [EDITOR_LAYER] = COMBO(editor_layer_combo, TO(EDITOR)), // U + I → Editor Layer
-    [NUM_LAYER] = COMBO(num_layer_combo, TO(NUM)), // J + K → Num Layer
-    [ALPHA_LAYER] = COMBO(alpha_layer_combo, TO(ALPHA)), // J + K → Num Layer
-};
-
-// Handle Alt + Right Arrow manually
-void process_combo_event(uint16_t combo_index, bool pressed) {
-    switch (combo_index) {
-        case ALT_RIGHT_ARROW:
-            if (pressed) {
-                register_code(KC_LALT);
-                tap_code(KC_RGHT);
-                unregister_code(KC_LALT);
-            }
-            break;
-    }
-}
-
-
-
-/*
-const uint16_t PROGMEM right_arrow_combo[] = {KC_L, KC_SCLN, COMBO_END};
-const uint16_t PROGMEM alt_right_arrow_combo[] = {KC_O, KC_P, COMBO_END};
-const uint16_t PROGMEM editor_layer_combo[] = {KC_U, KC_I, COMBO_END}; // Pressing F + G toggles EDITOR layer
-const uint16_t PROGMEM num_layer_combo[] = {KC_J, KC_K, COMBO_END};    // Pressing J + K toggles NUM layer
-
-combo_t key_combos[] = {
-    COMBO(right_arrow_combo, KC_RGHT),// L + ; → Right Arrow
-    COMBO(alt_right_arrow_combo, KC_RGHT),// L + ; → Right Arrow
-
-    COMBO(editor_layer_combo, TO(EDITOR)), // D + F → EDITOR Layer
-    COMBO(num_layer_combo, TO(NUM)),       // J + K → NUM Layer
-};*/
-
 /*** KEYMAPS ***/
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [ALPHA] = LAYOUT( // alpha layer
+	[ALPHA] = LAYOUT( // alpha layer
          LT(SYS, KC_Q),               KC_W,                 KC_E,             KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,                  KC_P,
-      LT(EDITOR, KC_A), MT(MOD_LALT, KC_S),   MT(MOD_RCTL, KC_D),    LT(NUM, KC_F),    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,               KC_SCLN,
+        LT(APPS, KC_A), MT(MOD_LALT, KC_S),   MT(MOD_RCTL, KC_D),    LT(NUM, KC_F),    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,               KC_SCLN,
     MT(MOD_LSFT, KC_Z),               KC_X, LT(NAVIGATION, KC_C), LT(EDITOR, KC_V),    KC_B,    KC_N,    KC_M, KC_COMM,  KC_DOT, MT(MOD_RSFT, KC_SLSH),
                     LT(NAVIGATION, KC_ESC),               KC_SPC,           KC_ENT, KC_BSPC
     ),
     [EDITOR] = LAYOUT(
-    KC_LSFT, QK_BOOT, _______, _______, KC_NUM, NVAUTOS, NVAUTOD, NVAUTOU, KC_LBRC, KC_RBRC,
+    KC_LSFT, QK_BOOT, _______, _______, _______, NVAUTOD, NVAUTOS, NVAUTOU, KC_LBRC, KC_RBRC,
     KC_RSFT, KC_PSCR,    COPY, _______, _______, KC_QUOT, KC_MINS,  KC_EQL, KC_LPRN, KC_RPRN,
     KC_LSFT,     CUT,   PASTE, _______, _______, _______,  KC_TAB, KC_QUOT,  KC_GRV, KC_BSLS,
-                             TO(ALPHA), _______, _______, KC_BSPC
+                               _______, _______, _______, KC_BSPC
     ),
     [NUM] = LAYOUT(
      KC_NUM,   KC_F1,   KC_F2,   KC_F3,   KC_F4, KC_PAST,    KC_7,   KC_8,   KC_9, KC_PMNS,
     _______,   KC_F5,   KC_F6,   KC_F7,   KC_F8, KC_PSLS,    KC_4,   KC_5,   KC_6, KC_PPLS,
     _______,   KC_F9,  KC_F10,  KC_F11,  KC_F12, KC_PEQL,    KC_1,   KC_2,   KC_3,  KC_DOT,
-                             TO(ALPHA), _______,  KC_ENT,    KC_0
+                               _______, _______,  KC_ENT,    KC_0
     ),
-    // [APPS] = LAYOUT(
-    // _______, PAVUCTRL,  SPOTIFY,  YTMUSIC,  EVINCE, _______, _______, _______, _______, _______,
-    // _______,  BROWSER, TERMINAL,   NEOVIM,    QUIT, _______, _______, _______, _______, _______,
-    // _______,     OSRS,  KC_PSCR, PROJECTS,  F_OSRS, _______, _______, _______, _______, _______,
-    //                               _______, _______, _______, _______
-    // ),
+    [APPS] = LAYOUT(
+    _______, PAVUCTRL,  SPOTIFY,  YTMUSIC,  EVINCE, _______, _______, _______, _______, _______,
+    _______,  BROWSER, TERMINAL,   NEOVIM,    QUIT, _______, _______, _______, _______, _______,
+    _______,     OSRS,  KC_PSCR, PROJECTS,  F_OSRS, _______, _______, _______, _______, _______,
+                                  _______, _______, _______, _______
+    ),
     [NAVIGATION] = LAYOUT(
            WKSP_5,  WKSP_6,   WKSP_7,  WKSP_8,  WKSP_9,  FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
            WKSP_1,  WKSP_2,   WKSP_3,  WKSP_4, WKSP_10,  FF_RFSH, KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,
@@ -165,21 +107,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                      _______,   TO(RS), TERMINAL, _______
     ),
     [MOVEMENT] = LAYOUT(
-    MWKSP_5, MWKSP_6, MWKSP_7, MWKSP_8,  MWKSP_9, _______, WSHRINK, HSHRINK,   HGROW,   WGROW,
+    MWKSP_5, MWKSP_6, MWKSP_7, MWKSP_8,  MWKSP_9, _______, _______, _______, _______, _______,
     MWKSP_1, MWKSP_2, MWKSP_3, MWKSP_4, MWKSP_10, _______, WINLEFT, WINDOWN,   WINUP, WINRGHT,
     _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______,
                                _______,  _______, _______, _______
     ),
     [RS] = LAYOUT(
-       KC_1,    KC_2,    KC_3,    KC_4,    KC_5,      KC_6,    KC_7,    KC_8,    KC_9,   KC_B,
-      KC_F1,   KC_F2,   KC_F3,   KC_F4, KC_LSFT, TO(ALPHA),    KC_4,    KC_5,    KC_6,   KC_C,
-      KC_F5,   KC_F6,   KC_F7,   KC_F8,  KC_F10,   MS_BTN1,    KC_1,    KC_2,    KC_3, F_OSRS,
-                           MT(MOD_RCTL, KC_ESC),  KC_SPC,   _______,    KC_0
+       KC_1,    KC_2,    KC_3,    KC_4,    KC_5,      KC_6,    KC_7,    KC_8,    KC_9,    KC_0,
+      KC_F1,   KC_F2,   KC_F3,   KC_F4, KC_LSFT, TO(ALPHA),    KC_4,    KC_5,    KC_6, _______,
+      KC_F5,   KC_F6,   KC_F7,   KC_F8,  KC_F10,      KC_C,    KC_1,    KC_2,    KC_3, _______,
+                                KC_ESC,  KC_SPC,   _______,    KC_0
     ),
     [SYS] = LAYOUT(
-    _______, PAVUCTRL,  SPOTIFY, YTMUSIC,   EVINCE, FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
-    _______,  BROWSER, TERMINAL, NEOVIM,      QUIT, KC_MPLY, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
-    _______,     OSRS,  KC_PSCR, PROJECTS,  F_OSRS, KC_MUTE, SPOTIFY, KC_BRIU, KC_BRID, YTMUSIC,
+    _______, _______,  _______, _______, _______, FF_NTAB, FF_LEFT, MS_WHLD, MS_WHLU, FF_RGHT,
+    _______, _______,  _______, _______, _______, KC_MPLY, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
+       QUIT, BROWSER, TERMINAL,  NEOVIM,   DMENU, KC_MUTE, SPOTIFY, KC_BRIU, KC_BRID, YTMUSIC,
                                 _______, TO(ALPHA), _______, _______
     )
 };
@@ -289,11 +231,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case WINDOWN: if (p) alt_shift(KC_DOWN, p); return false;
         case WINUP:   if (p) alt_shift(KC_UP, p); return false;
         case WINRGHT: if (p) alt_shift(KC_RGHT, p); return false;
-
-        case WSHRINK: if (p) alt_shift(KC_Y, p); return false;
-        case HGROW:   if (p) alt_shift(KC_I, p); return false;
-        case HSHRINK: if (p) alt_shift(KC_U, p); return false;
-        case WGROW:   if (p) alt_shift(KC_O, p); return false;
 
         // Firefox shortcuts
         case FF_RGHT:

@@ -37,6 +37,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PERMISSIVE_HOLD
 #define QUICK_TAP_TERM 0
 
+#define COMBO_TERM 50  // Default is 50ms. Lower = faster combos, higher = slower.
+#define COMBO_MUST_TAP_PER_COMBO  // Ensures keys are *tapped* (not held).
+
 // Underglow configuration
 #ifdef RGBLIGHT_ENABLE
 #    define RGBLIGHT_EFFECT_BREATHING

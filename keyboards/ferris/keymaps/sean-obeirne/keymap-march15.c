@@ -171,9 +171,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                _______,  _______, _______, _______
     ),
     [RS] = LAYOUT(
-       KC_1,    KC_2,    KC_3,    KC_4,    KC_5,      KC_6,    KC_7,    KC_8,    KC_9,   KC_B,
-      KC_F1,   KC_F2,   KC_F3,   KC_F4, KC_LSFT, TO(ALPHA),    KC_4,    KC_5,    KC_6,   KC_C,
-      KC_F5,   KC_F6,   KC_F7,   KC_F8,  KC_F10,   MS_BTN1,    KC_1,    KC_2,    KC_3, F_OSRS,
+       KC_1,    KC_2,    KC_3, KC_KP_4, KC_KP_5,      KC_6,    KC_7,    KC_8,    KC_9,    KC_0,
+      KC_F1,   KC_F2,   KC_F3,   KC_F4, KC_LSFT, TO(ALPHA),    KC_4,    KC_5,    KC_6,  F_OSRS,
+      KC_F5,   KC_F6,   KC_F7,   KC_F8,  KC_F10,      KC_C,    KC_1,    KC_2,    KC_3, MS_BTN1,
                            MT(MOD_RCTL, KC_ESC),  KC_SPC,   _______,    KC_0
     ),
     [SYS] = LAYOUT(
